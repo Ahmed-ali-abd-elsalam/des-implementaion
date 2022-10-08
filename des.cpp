@@ -1,5 +1,5 @@
-#include <bits/stdc++.h>
-#include <fstream>
+#include "des.h"
+
 
 
 /* the file input needs to be changed so it can read hex input */
