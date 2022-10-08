@@ -5,33 +5,71 @@
 /* the file input needs to be changed so it can read hex input */
 
 using namespace std;
-int charToInt(char c)
+string HexToBin(char s)
 {
-	return int(c);
-}
-string decToBinary(int n)
-{
-	// array to store binary number
-	string binaryNum = "";
-	int i = 0;
-	// counter for binary array
-	while (n > 0)
-	{
-		// storing remainder in binary array
-		binaryNum = char('0' + n % 2) + binaryNum;
-		n = n / 2;
-		i++;
-	}
-	if (binaryNum.size() < 8)
-	{
-		for (int i = binaryNum.size(); i < 8; i++)
+	string bin = "";
+	
+		switch (s)
 		{
-			binaryNum = '0' + binaryNum;
+		case '0':
+			bin += "0000";
+			break;
+		case '1':
+			bin += "0001";
+			break;
+		case '2':
+			bin += "0010";
+			break;
+		case '3':
+			bin += "0011";
+			break;
+		case '4':
+			bin += "0100";
+			break;
+		case '5':
+			bin += "0101";
+			break;
+		case '6':
+			bin += "0110";
+			break;
+		case '7':
+			bin += "0111";
+			break;
+		case '8':
+			bin += "1000";
+			break;
+		case '9':
+			bin += "1001";
+			break;
+		case 'A':
+		case 'a':
+			bin += "1010";
+			break;
+		case 'B':
+		case 'b':
+			bin += "1011";
+			break;
+		case 'C':
+		case 'c':
+			bin += "1100";
+			break;
+		case 'D':
+		case 'd':
+			bin += "1101";
+			break;
+		case 'E':
+		case 'e':
+			bin += "1110";
+			break;
+		case 'F':
+		case 'f':
+			bin += "1111";
+			break;
 		}
-	}
-	// returnin binary in string
-	return binaryNum;
+	return bin;
 }
+
+
 // every module or block should be an function
 // initial permutation hopefully done
 bitset<64> intialPermutation(bitset<64>plainText){
@@ -67,6 +105,7 @@ bitset<64> intialPermutation(bitset<64>plainText){
 
 // bitset<64> plaintext,bitset<64>key
 void round(bitset<64> plaintext,bitset<64>key){
+	// initial split
 	string ones ="", zeros ="";
 	for(int i=0;i<64/2;i++){
 		ones+="1";
@@ -79,6 +118,8 @@ void round(bitset<64> plaintext,bitset<64>key){
 	cout<<leftText<<"    "<<right<<endl;
 	leftText = plaintext|leftText;
 	rightText = plaintext|rightText;
+
+
 	// f is the input of the xor
 	// rightText = leftText^F;
 	// leftText = rightText
@@ -104,22 +145,24 @@ int main()
 	write.open("binary.txt");
 	string x;
 	// writing biary
+	string bin="";
 	while (getline(read, x))
 	{
 		for (int i = 0; i < x.size(); i++)
 		{
-			int let = charToInt(x[i]);
-			if (i % 8 == 0 && i > 0)
+			bin = HexToBin(x[i]);
+			cout<<bin;
+	 	if (i %16  == 0 && i > 0)
 			{
 				write << "\n";
+				bin = "";
 			}
-			// write string rep in file
-			// write<<decToBinary(let);
-			// write binary rep in file
-			bitset<8> bset(decToBinary(let));
-			write << bset;
+		// 	// write string rep in file
+		// 	// write<<decToBinary(let);
+		// 	// write binary rep in file
+		// 	bitset<8> bset(decToBinary(let));
+			write << bin;
 		}
-		write << "\n";
 	}
 	read.close();
 	write.close();
