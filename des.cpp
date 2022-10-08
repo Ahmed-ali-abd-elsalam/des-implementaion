@@ -120,14 +120,29 @@ bitset<64> inverseIntialPermutation(bitset<64>plainText){
 		result = result|(((plainText<<(64-IIP_t[i]))>>63)<<(i));
 	}
 	return result;
-
 }
-
-
-// void expansion(bitset<64> *rightText){
-
-
-// }
+bitset<64> expansion(bitset<64> rightSide){
+		const int E_t[48] = {32, 1, 2, 3, 4, 5, // expantion table
+						 4, 5, 6, 7, 8, 9,
+						 8, 9, 10, 11, 12, 13,
+						 12, 13, 14, 15, 16, 17,
+						 16, 17, 18, 19, 20, 21,
+						 20, 21, 22, 23, 24, 25,
+						 24, 25, 26, 27, 28, 29,
+						 28, 29, 30, 31, 32, 1};
+		string s= "";
+		for(int i=0;i<64;i++){
+			s+="0";
+		}
+		// cout<<(rightSide<<(64-1))<<endl;
+		// 	cout<<((rightSide<<(64-1))>>63)<<endl;
+		// cout<<(((rightSide<<(64-1))>>63)<<2-1)<<endl;
+	bitset<64> result(s);
+	for(int i=0;i<48;i++){
+			result = result|(((rightSide<<(64-E_t[i]))>>63)<<i);
+	}
+	return result;
+}
 
 // bitset<64> plaintext,bitset<64>key
 void round(bitset<64> plaintext,bitset<64>key){
@@ -160,14 +175,15 @@ int main()
 	"0000001000000000000000000000000000000000000000000000000000000000"	58
 	"0000000000000010000000000000000000000000000000000000000000000000"	50
 	"0000000000000000000000000000000000000000000000000000001000000000"	10
-	"0000000000000000000000000000000000000000000000000000000010000000" 	8*/
+	"0000000000000000000000000000000000000000000000000000000010000000" 	8 */
 	// string z = "0000000000000000000000000000000000000000000000000000000000000010";
 	// cout<<z.size()<<endl<<z.find("1")<<endl;
-	// bitset<64> s("0000000000000000000000000000000000000000000000000000000000000010");
+	// bitset<64> s("0000000000000000000000000000000000000000000000000000000000000001");
 	// cout<<s<<endl;
 	// cout<<intialPermutation(s);
 	// cout<<inverseIntialPermutation(s);
-
+	// cout<<expansion(s);
+	
 	ifstream read;
 	read.open("trial.txt");
 	ofstream write;
