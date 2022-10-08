@@ -93,10 +93,36 @@ bitset<64> intialPermutation(bitset<64>plainText){
 			cout<<(((plainText<<(64-10))>>63)<<7-1)<<endl; */
 
 	for(int i=0;i<64;i++){
-		result = result|(((plainText<<(64-IP_t[i]))>>63)<<((i==0)? i:i-1));
+		result = result|(((plainText<<(64-IP_t[i]))>>63)<<(i));
 	}
 	return result;
 }
+bitset<64> inverseIntialPermutation(bitset<64>plainText){
+	const int IIP_t[64] = {40, 8, 48, 16, 56, 24, 64, 32,
+						 39, 7, 47, 15, 55, 23, 63, 31,
+						 38, 6, 46, 14, 54, 22, 62, 30,
+						 37, 5, 45, 13, 53, 21, 61, 29,
+						 36, 4, 44, 12, 52, 20, 60, 28,
+						 35, 3, 43, 11, 51, 19, 59, 27,
+						 34, 2, 42, 10, 50, 18, 58, 26,
+						 33, 1, 41, 9, 49, 17, 57, 25};
+						 string s="";
+	for(int i=0;i<64;i++){
+		s+="0";
+	}
+	bitset<64> result(s);
+	// for debugging
+			// cout<<(plainText<<(64-8))<<endl;
+			// cout<<((plainText<<(64-8))>>63)<<endl;
+			// cout<<(((plainText<<(64-8))>>63)<<2-1)<<endl;
+
+	for(int i=0;i<64;i++){
+		result = result|(((plainText<<(64-IIP_t[i]))>>63)<<(i));
+	}
+	return result;
+
+}
+
 
 // void expansion(bitset<64> *rightText){
 
@@ -132,12 +158,15 @@ int main()
 	// this values are for debugging
 	/* "0000000000000000000000000000000000000000000000000000000000000010"	2
 	"0000001000000000000000000000000000000000000000000000000000000000"	58
+	"0000000000000010000000000000000000000000000000000000000000000000"	50
 	"0000000000000000000000000000000000000000000000000000001000000000"	10
-	string z = "0000001000000000000000000000000000000000000000000000000000000000";
-	cout<<z.size()<<endl<<z.find("1")<<endl;
-	bitset<64> s("0000001000000000000000000000000000000000000000000000000000000000");
-	cout<<s<<endl;
-	cout<<intialPermutation(s); */
+	"0000000000000000000000000000000000000000000000000000000010000000" 	8*/
+	// string z = "0000000000000000000000000000000000000000000000000000000000000010";
+	// cout<<z.size()<<endl<<z.find("1")<<endl;
+	// bitset<64> s("0000000000000000000000000000000000000000000000000000000000000010");
+	// cout<<s<<endl;
+	// cout<<intialPermutation(s);
+	// cout<<inverseIntialPermutation(s);
 
 	ifstream read;
 	read.open("trial.txt");
@@ -151,7 +180,7 @@ int main()
 		for (int i = 0; i < x.size(); i++)
 		{
 			bin = HexToBin(x[i]);
-			cout<<bin;
+			// cout<<bin;
 	 	if (i %16  == 0 && i > 0)
 			{
 				write << "\n";
