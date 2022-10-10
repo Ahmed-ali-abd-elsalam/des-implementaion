@@ -6,8 +6,9 @@
 			3 left shift
 			4 xors
 			5 key side splitting
-			6 reading key file and binary file at the same time
-			7 optimization
+			6 setting up the single round function
+			7 reading key file and binary file at the same time
+			8 optimization
 			 */
 using namespace std;
 string BinToHex(string s)
