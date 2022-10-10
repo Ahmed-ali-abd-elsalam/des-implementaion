@@ -243,7 +243,7 @@ bitset<64> permutaion(bitset<64> rightSide){
 
 
 // bitset<64> plaintext,bitset<64>key
-void round(bitset<64> plaintext,bitset<64>key){
+bitset<64> singleRound(bitset<64> plaintext,bitset<64>key){
 	// initial split
 	string ones ="", zeros ="";
 	for(int i=0;i<64/2;i++){
@@ -289,33 +289,16 @@ void round(bitset<64> plaintext,bitset<64>key){
 		rightText = cypherText;
 	}
 
-
-	// f is the input of the xor
-	// rightText = leftText^F;
-	// leftText = rightText
-
+	cypherText = cypherText<<64;
+	cypherText = cypherText|leftText;
+	cypherText = cypherText|rightText;
+	cypherText = inverseIntialPermutation(cypherText);
+	return cypherText;
 }
 
 int main()
 {
-	// round();
-	// this values are for debugging
-	/* "0000000000000000000000000000000000000000000000000000000000000010"	2
-	"0000001000000000000000000000000000000000000000000000000000000000"	58
-	"0000000100000000000000000000000000000000000000000000000000000000"	57
-	"0000000000000010000000000000000000000000000000000000000000000000"	50
-	"0000000000000000000000000000000000000000000000000000001000000000"	10
-	"0000000000000000000000000000000000000000000000000000000100000000"	9
-	"0000000000000000000000000000000000000000000000000000000010000000" 	8 */
-	// string z = "0000000000000000000000000000000000000000000000000000000000000001";
-	// cout<<z.size()<<endl<<z.find("1")<<endl;
-	// bitset<64> s("0000000000000000000000000000000000000000000000000000000000000001");
-	// cout<<s<<endl;
-	// cout<<intialPermutation(s);
-	// cout<<inverseIntialPermutation(s);
-	// cout<<expansion(s);
-	// cout<<permutationChoiceKey1(s);
-	// cout<<permutationChoiceKey2(s);
+
 	ifstream read;
 	read.open("trial.txt");
 	ofstream write;
@@ -327,17 +310,12 @@ int main()
 	{
 		for (int i = 0; i < x.size(); i++)
 		{
-			bin = HexToBin(x[i]);
-			// cout<<bin;
+		bin = HexToBin(x[i]);
 	 	if (i %16  == 0 && i > 0)
 			{
 				write << "\n";
 				bin = "";
 			}
-		// 	// write string rep in file
-		// 	// write<<decToBinary(let);
-		// 	// write binary rep in file
-		// 	bitset<8> bset(decToBinary(let));
 			write << bin;
 		}
 	}
@@ -345,8 +323,7 @@ int main()
 	write.close();
 	read.open("binary.txt");
 	write.open("cypher.txt");
-	string s ="123456789";
-	cout<<s.substr(4,4);
+	string s ;
 	while (getline(read, x))
 	{
 		for(int i=0;i<x.size();i = i+4){
