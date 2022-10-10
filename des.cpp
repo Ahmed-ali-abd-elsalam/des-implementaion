@@ -1,10 +1,58 @@
 #include "des.h"
 
-
-
-/* the file input needs to be changed so it can read hex input */
-
+/*   *************** remaining
+			1 S-box
+			2 permutation
+			3 left shift
+			4 xors
+			5 key side splitting
+			6 reading key file and binary file at the same time
+			7 optimization
+			 */
 using namespace std;
+string BinToHex(string s)
+{
+	string hex = "";
+	for (int i = 0; i < s.size(); i += 4)
+	{
+		string k = "";
+		for (int j = i; j < i + 4; j++)
+			k += s[j];
+		if (k == "0000")
+			hex += '0';
+		else if (k == "0001")
+			hex += '1';
+		else if (k == "0010")
+			hex += '2';
+		else if (k == "0011")
+			hex += '3';
+		else if (k == "0100")
+			hex += '4';
+		else if (k == "0101")
+			hex += '5';
+		else if (k == "0110")
+			hex += '6';
+		else if (k == "0111")
+			hex += '7';
+		else if (k == "1000")
+			hex += '8';
+		else if (k == "1001")
+			hex += '9';
+		else if (k == "1010")
+			hex += 'A';
+		else if (k == "1011")
+			hex += 'B';
+		else if (k == "1100")
+			hex += 'C';
+		else if (k == "1101")
+			hex += 'D';
+		else if (k == "1110")
+			hex += 'E';
+		else if (k == "1111")
+			hex += 'F';
+	}
+	return hex;
+}
 string HexToBin(char s)
 {
 	string bin = "";
@@ -106,18 +154,51 @@ bitset<64> inverseIntialPermutation(bitset<64>plainText){
 						 35, 3, 43, 11, 51, 19, 59, 27,
 						 34, 2, 42, 10, 50, 18, 58, 26,
 						 33, 1, 41, 9, 49, 17, 57, 25};
-						 string s="";
+	string s="";
 	for(int i=0;i<64;i++){
 		s+="0";
 	}
 	bitset<64> result(s);
-	// for debugging
-			// cout<<(plainText<<(64-8))<<endl;
-			// cout<<((plainText<<(64-8))>>63)<<endl;
-			// cout<<(((plainText<<(64-8))>>63)<<2-1)<<endl;
-
 	for(int i=0;i<64;i++){
 		result = result|(((plainText<<(64-IIP_t[i]))>>63)<<(i));
+	}
+	return result;
+}
+bitset<64> permutationChoiceKey1(bitset<64> key){
+	const int pc_1[56] = {57, 49, 41, 33, 25, 17, 9,
+						1, 58, 50, 42, 34, 26, 18,
+						10, 2, 59, 51, 43, 35, 27,
+						19, 11, 3, 60, 52, 44, 36,
+						63, 55, 47, 39, 31, 23, 15,
+						7, 62, 54, 46, 38, 30, 22,
+						14, 6, 61, 53, 45, 37, 29,
+						21, 13, 5, 28, 20, 12, 4};
+	string s="";
+	for(int i=0;i<64;i++){
+		s+="0";
+	}
+	bitset<64> result(s);
+		for(int i=0;i<64;i++){
+		result = result|(((key<<(64-pc_1[i]))>>63)<<(i));
+	}
+	return result;
+}
+bitset<64> permutationChoiceKey2(bitset<64> key){
+	const int pc_2[48] = {14, 17, 11, 24, 1, 5,
+						  3, 28, 15, 6, 21, 10,
+						  23, 19, 12, 4, 26, 8,
+						  16, 7, 27, 20, 13, 2,
+						  41, 52, 31, 37, 47, 55,
+						  30, 40, 51, 45, 33, 48,
+						  44, 49, 39, 56, 34, 53,
+						  46, 42, 50, 36, 29, 32};
+	string s="";
+	for(int i=0;i<64;i++){
+		s+="0";
+	}
+	bitset<64> result(s);
+		for(int i=0;i<64;i++){
+		result = result|(((key<<(64-pc_2[i]))>>63)<<(i));
 	}
 	return result;
 }
@@ -173,17 +254,20 @@ int main()
 	// this values are for debugging
 	/* "0000000000000000000000000000000000000000000000000000000000000010"	2
 	"0000001000000000000000000000000000000000000000000000000000000000"	58
+	"0000000100000000000000000000000000000000000000000000000000000000"	57
 	"0000000000000010000000000000000000000000000000000000000000000000"	50
 	"0000000000000000000000000000000000000000000000000000001000000000"	10
+	"0000000000000000000000000000000000000000000000000000000100000000"	9
 	"0000000000000000000000000000000000000000000000000000000010000000" 	8 */
-	// string z = "0000000000000000000000000000000000000000000000000000000000000010";
+	// string z = "0000000000000000000000000000000000000000000000000000000000000001";
 	// cout<<z.size()<<endl<<z.find("1")<<endl;
 	// bitset<64> s("0000000000000000000000000000000000000000000000000000000000000001");
 	// cout<<s<<endl;
 	// cout<<intialPermutation(s);
 	// cout<<inverseIntialPermutation(s);
 	// cout<<expansion(s);
-	
+	// cout<<permutationChoiceKey1(s);
+	// cout<<permutationChoiceKey2(s);
 	ifstream read;
 	read.open("trial.txt");
 	ofstream write;
@@ -213,9 +297,15 @@ int main()
 	write.close();
 	read.open("binary.txt");
 	write.open("cypher.txt");
+	string s ="123456789";
+	cout<<s.substr(4,4);
 	while (getline(read, x))
 	{
-		write << x << endl;
+		for(int i=0;i<x.size();i = i+4){
+			s = x.substr(i,4);
+			write<<BinToHex(s);
+		}
+		// write << x << endl;
 	}
 	return 0;
 }
