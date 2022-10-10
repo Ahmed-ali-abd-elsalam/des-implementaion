@@ -2,13 +2,10 @@
 
 /*   *************** remaining
 			1 S-box
-			2 permutation
-			3 left shift
-			4 xors
-			5 key side splitting
-			6 setting up the single round function
-			7 reading key file and binary file at the same time
-			8 optimization
+			2 left shift
+			3 removing the the comments from single round function after writing the sbox function
+			4 reading key file and binary file at the same time
+			5 optimization
 			 */
 using namespace std;
 string BinToHex(string s)
@@ -120,10 +117,8 @@ string HexToBin(char s)
 
 
 // every module or block should be an function
-// initial permutation hopefully done
 bitset<64> intialPermutation(bitset<64>plainText){
-		//  Initial Permutation (IP)
-	const int IP_t[64] = {58, 50, 42, 34, 26, 18, 10, 2, // intital permutation table
+	const int IP_t[64] = {58, 50, 42, 34, 26, 18, 10, 2, 
 						  60, 52, 44, 36, 28, 20, 12, 4,
 						  62, 54, 46, 38, 30, 22, 14, 6,
 						  64, 56, 48, 40, 32, 24, 16, 8,
@@ -216,15 +211,36 @@ bitset<64> expansion(bitset<64> rightSide){
 		for(int i=0;i<64;i++){
 			s+="0";
 		}
-		// cout<<(rightSide<<(64-1))<<endl;
-		// 	cout<<((rightSide<<(64-1))>>63)<<endl;
-		// cout<<(((rightSide<<(64-1))>>63)<<2-1)<<endl;
+
 	bitset<64> result(s);
 	for(int i=0;i<48;i++){
 			result = result|(((rightSide<<(64-E_t[i]))>>63)<<i);
 	}
 	return result;
 }
+// bitset<64> sbox(bitset<64> cyphertext){}
+// bitset<64> leftshift(bitset<64> keyhalf){}
+
+bitset<64> permutaion(bitset<64> rightSide){
+		const int P[32] = {16, 7, 20, 21,
+					   29, 12, 28, 17,
+					   1, 15, 23, 26,
+					   5, 18, 31, 10,
+					   2, 8, 24, 14,
+					   32, 27, 3, 9,
+					   19, 13, 30, 6,
+					   22, 11, 4, 25};
+	string s= "";
+	for(int i=0;i<64;i++){
+			s+="0";
+	}
+	bitset<64> result(s);
+	for(int i=0;i<48;i++){
+			result = result|(((rightSide<<(64-P[i]))>>63)<<i);
+	}
+	return result;
+}
+
 
 // bitset<64> plaintext,bitset<64>key
 void round(bitset<64> plaintext,bitset<64>key){
@@ -236,11 +252,42 @@ void round(bitset<64> plaintext,bitset<64>key){
 	}
 	string right=zeros+ones;
 	string left =ones+zeros;
+	plaintext = intialPermutation(plaintext);
+	// right side and left side of the plain text before the round
 	bitset<64> leftText(left);
 	bitset<64> rightText(left);
-	cout<<leftText<<"    "<<right<<endl;
 	leftText = plaintext|leftText;
 	rightText = plaintext|rightText;
+	leftText = leftText>>32;
+	bitset<64> cypherText(zeros+zeros);
+	
+	// key intial operations before the rounds
+	key = permutationChoiceKey1(key);
+	ones = ones.substr(0,28);
+	zeros = zeros+zeros.substr(0,32-28);
+	bitset<64>keyLeft(ones+zeros);
+	bitset<64>keyright(zeros+ones);
+	keyright = key|keyright;
+	keyLeft = key|keyLeft;
+	keyLeft = keyLeft>>(64-28);
+	zeros = zeros+zeros.substr(0,64-zeros.size());
+
+	for(int i=0;i<16;i++){
+		cypherText = expansion(rightText);
+		// keyLeft = leftshift(keyLeft);
+		// keyright = leftshift(keyright);
+		key = key<<64;
+		key = key|(keyLeft<<(64-28));
+		key = key|keyright;
+		key = permutationChoiceKey2(key);
+		cypherText= cypherText^key;
+		// cypherText = sbox(cypherText);
+		cypherText = permutaion(cypherText);
+		// ********** cyphertext is f output
+		cypherText=leftText^cypherText;
+		leftText = rightText;
+		rightText = cypherText;
+	}
 
 
 	// f is the input of the xor
@@ -274,7 +321,7 @@ int main()
 	ofstream write;
 	write.open("binary.txt");
 	string x;
-	// writing biary
+	// writing binary
 	string bin="";
 	while (getline(read, x))
 	{
@@ -306,7 +353,6 @@ int main()
 			s = x.substr(i,4);
 			write<<BinToHex(s);
 		}
-		// write << x << endl;
 	}
 	return 0;
 }
