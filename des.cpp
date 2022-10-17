@@ -4,8 +4,7 @@
 			1 S-box
 			2 left shift
 			3 removing the the comments from single round function after writing the sbox function
-			4 reading key file and binary file at the same time
-			5 optimization
+			4 optimization
 			 */
 using namespace std;
 string BinToHex(string s)
@@ -131,10 +130,6 @@ bitset<64> intialPermutation(bitset<64>plainText){
 		s+="0";
 	}
 	bitset<64> result(s);
-	// for debugging
-/* 			cout<<(plainText<<(64-10))<<endl;
-			cout<<((plainText<<(64-10))>>63)<<endl;
-			cout<<(((plainText<<(64-10))>>63)<<7-1)<<endl; */
 
 	for(int i=0;i<64;i++){
 		result = result|(((plainText<<(64-IP_t[i]))>>63)<<(i));
@@ -255,7 +250,7 @@ bitset<64> singleRound(bitset<64> plaintext,bitset<64>key){
 	plaintext = intialPermutation(plaintext);
 	// right side and left side of the plain text before the round
 	bitset<64> leftText(left);
-	bitset<64> rightText(left);
+	bitset<64> rightText(right);
 	leftText = plaintext|leftText;
 	rightText = plaintext|rightText;
 	leftText = leftText>>32;
@@ -277,7 +272,7 @@ bitset<64> singleRound(bitset<64> plaintext,bitset<64>key){
 		// keyLeft = leftshift(keyLeft);
 		// keyright = leftshift(keyright);
 		key = key<<64;
-		key = key|(keyLeft<<(64-28));
+		key = key|(keyLeft<<(56-28));
 		key = key|keyright;
 		key = permutationChoiceKey2(key);
 		cypherText= cypherText^key;
@@ -296,10 +291,21 @@ bitset<64> singleRound(bitset<64> plaintext,bitset<64>key){
 	return cypherText;
 }
 
+
+
+
+
 int main()
 {
 
 	ifstream read;
+		
+	// reading key file
+	read.open("key.txt");
+	string key ="";
+	getline(read,key);
+	read.close();
+
 	read.open("trial.txt");
 	ofstream write;
 	write.open("binary.txt");
@@ -321,6 +327,8 @@ int main()
 	}
 	read.close();
 	write.close();
+
+	// reading binary file
 	read.open("binary.txt");
 	write.open("cypher.txt");
 	string s ;
