@@ -148,17 +148,14 @@ u64 sbox(u64 rightSide)
                         {7, 11, 4, 1, 9, 12, 14, 2, 0, 6, 10, 13, 15, 3, 5, 8},
                         {2, 1, 14, 7, 4, 10, 8, 13, 15, 12, 9, 0, 3, 5, 6, 11}}};
     u64 out = 0;
-    rightSide =3;
     for (int i = 0; i < 8; i++)
     {
-        int off = i * 64;
         u64 idx = (rightSide >> ((7 - i) * 6)) & 0x3f;
         idx = ((idx >> 1) & 15) |
               ((idx & 1) << 4) |
               (idx & 0x20);
         out = out|(u64(S[i][idx >> 4][idx & 15] )<< ((7 - i) * 4));
     }
-    cout << endl;
     return out;
 }
 u64 leftshift(u64 keyhalf, int index)
@@ -171,8 +168,7 @@ u64 leftshift(u64 keyhalf, int index)
     // keyhalf = (keyhalf << (64 - 28)) >> (64 - 28);
     return keyhalf;
 }
-u64 singleRound(u64 plaintext, u64 key)
-{
+u64 singleRound(u64 plaintext, u64 key){
 
     // intitaal permutation and plain text split
     plaintext = intialPermutation(plaintext);
@@ -204,6 +200,10 @@ u64 singleRound(u64 plaintext, u64 key)
         leftText = rightText;
         rightText = cypherText;
     }
+    cypherText = rightText;
+    rightText = leftText;
+    leftText = cypherText;
+    
 
     cypherText = 0;
     cypherText = cypherText | (leftText << 32);
