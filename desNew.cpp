@@ -3,7 +3,7 @@ using namespace std;
 
 typedef unsigned long long u64;
 
-u64 readDESInput(string data){
+u64 readDESInputhex(string data){
     u64 value =0;
     for(int i=0; i<16 ; i++){
         char c = data[i];
@@ -241,6 +241,6 @@ int main()
 
         }
         //cout << s;
-        cout << readDESInput(s);
+        cout << readDESInputhex(s);
 
 }
