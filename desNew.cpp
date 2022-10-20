@@ -3,7 +3,7 @@ using namespace std;
 
 typedef unsigned long long u64;
 
-u64 readDESInputhex(string data){
+u64 readDESInputhex(const char *data){
     u64 value =0;
     for(int i=0; i<16 ; i++){
         char c = data[i];
@@ -286,16 +286,13 @@ void readMessagePlain (){
 
 int main()
 {
-    string s;
+    //Read key input as 16 hex characters
+    char s[16]; 
     ifstream file;
     file.open("key.txt");
-        while(file){
-            getline(file , s);
+    file >> s;
+    cout << readDESInputhex(s);
 
-        }
-        //cout << s;
-        cout << readDESInputhex(s);
-    
     // Plain Text 
     // readMessagePlain();
 
