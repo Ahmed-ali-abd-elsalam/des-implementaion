@@ -291,7 +291,7 @@ int main()
     ifstream file;
     file.open("key.txt");
     file >> s;
-    cout << readDESInputhex(s);
+    u64 key = readDESInputhex(s);
 
     // Plain Text 
     // readMessagePlain();
