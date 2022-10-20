@@ -3,6 +3,25 @@ using namespace std;
 
 typedef unsigned long long u64;
 
+u64 readDESInput(string data){
+    u64 value =0;
+    for(int i=0; i<16 ; i++){
+        char c = data[i];
+        if(c>='0' && c<='9'){
+            value |= (u64) (c-'0') << ((15-i)<<2);
+        }
+        else if(c>='A' && c<='F'){
+            value |= (u64) (c-'A' +10) << ((15-i)<<2);
+        }
+        else if(c>='a' && c<='f'){
+         value |= (u64) (c-'a' +10) << ((15-i)<<2);
+
+    }
+}
+ return value;
+
+}
+
 u64 intialPermutation(u64 plainText)
 {
     const int IP_t[64] = {58, 50, 42, 34, 26, 18, 10, 2,
@@ -214,5 +233,14 @@ u64 singleRound(u64 plaintext, u64 key){
 
 int main()
 {
+    string s;
+    ifstream file;
+    file.open("key.txt");
+        while(file){
+            getline(file , s);
+
+        }
+        //cout << s;
+        cout << readDESInput(s);
 
 }
