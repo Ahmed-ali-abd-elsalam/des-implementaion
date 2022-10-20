@@ -230,6 +230,59 @@ u64 singleRound(u64 plaintext, u64 key){
     cypherText = inverseIntialPermutation(cypherText);
     return cypherText;
 }
+unsigned long long messgaePlainHelper (int x , unsigned long long d , int i){
+
+    d |= (unsigned long long)(x) << ((7-i) << 3);
+    return d;
+
+}
+void readMessagePlain (){
+    std::ifstream t("message.txt");
+    std::stringstream buffer;
+    buffer << t.rdbuf();
+    string s = buffer.str();
+    vector <string> abo3li;
+    int counter = 0;
+    string temp = "";
+
+
+    for (auto c : s){
+        temp += c;
+        counter++;
+        if (counter == 8){
+            abo3li.push_back(temp);
+            counter=0;
+            temp="";
+        }
+    }
+
+    int arr[abo3li.size()][8];
+    for (int i = 0 ; i < abo3li.size(); i++){
+        string temporary = abo3li[i];
+        for (int j = 0 ; j <8; j++){
+            arr[i][j] = int(temporary[j]);
+        }
+    }
+
+    unsigned long long converted_array [abo3li.size()];
+    for (int i = 0 ; i < abo3li.size(); i++){
+            unsigned long long value = 0;
+        for (int j = 0 ; j < 8; j++){
+            value = messgaePlainHelper(abo3li[i][j], value, j);
+        }
+        converted_array[i] = value;
+        value = 0;
+    }
+
+    /* for (auto i : arr[0]){
+        cout << i << " ";
+    }
+    cout << endl;
+    cout << converted_array[0]; */
+
+    // all in converted_array
+
+}
 
 int main()
 {
@@ -242,5 +295,8 @@ int main()
         }
         //cout << s;
         cout << readDESInputhex(s);
+    
+    // Plain Text 
+    // readMessagePlain();
 
 }
