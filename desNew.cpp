@@ -1,7 +1,15 @@
 #include <bits/stdc++.h>
-using namespace std;
+#ifdef __GNUC__
+# define __rdtsc __builtin_ia32_rdtsc
+#else
+# include<intrin.h>
+#endif
 
+using namespace std;
 typedef unsigned long long u64;
+
+u64* converted = new u64 [214748364];
+int convertedSize = 0;
 
 u64 readDESInputhex(const char *data){
     u64 value =0;
@@ -15,11 +23,49 @@ u64 readDESInputhex(const char *data){
         }
         else if(c>='a' && c<='f'){
          value |= (u64) (c-'a' +10) << ((15-i)<<2);
-
     }
 }
  return value;
+}
 
+u64 messagePlainHelper (int x , u64 d , int i){
+    d |= (u64)(x) << ((7-i) << 3);
+    return d;
+}
+
+void readMessagePlain (){
+    // array of characters
+    char* array1 = new char [214748364];
+    int array_length = 0;
+    // filling the array
+    char ch;
+    ifstream file;
+    file.open("plain_text.txt" , ios::in);
+    int c = 0;
+    while (!file.eof()){
+        file >> noskipws >> ch;
+        array1[c++] = ch;
+    }
+    array_length = c;
+    int eights =ceil( ((double) (array_length))/8);
+    // 2d array filling  with ascii values of 8 characters for each row
+    int arr [eights][8];
+    int counter = 0;
+    for (int i = 0 ; i < eights ; i++){
+        for (int j = 0 ; j < 8 ; j++){
+            arr[i][j]= int( array1[counter++]);
+        }
+    }
+    // filling the u64 int array called converted
+    convertedSize = eights;
+    for (int i = 0 ; i < convertedSize; i++){
+            u64 value = 0;
+        for (int j = 0 ; j < 8; j++){
+            value = messagePlainHelper(arr[i][j], value, j);
+        }
+        converted[i] = value;
+        value = 0;
+    }
 }
 
 u64 intialPermutation(u64 plainText)
@@ -33,8 +79,7 @@ u64 intialPermutation(u64 plainText)
                           61, 53, 45, 37, 29, 21, 13, 5,
                           63, 55, 47, 39, 31, 23, 15, 7};
     u64 result = 0;
-    for (int i = 0; i < 64; i++)
-    {
+    for (int i = 0; i < 64; i++){
         result |= (plainText >> (64 - IP_t[i]) & 1) << 64 - (i + 1);
     }
     return result;
@@ -69,9 +114,9 @@ u64 permutationChoiceKey1(u64 key)
                           14, 6, 61, 53, 45, 37, 29,
                           21, 13, 5, 28, 20, 12, 4};
     u64 result = 0;
-    for (int i = 0; i < 64; i++)
+    for (int i = 0; i < 56; i++)
     {
-        result |= (key >> (64 - pc_1[i]) & 1) << 64 - (i + 1);
+        result |= ((key >> (64 - pc_1[i])) & 1) << 64 - (i+1);
     }
     return result;
 }
@@ -87,7 +132,7 @@ u64 permutationChoiceKey2(u64 key)
                           44, 49, 39, 56, 34, 53,
                           46, 42, 50, 36, 29, 32};
     u64 result = 0;
-    for (int i = 0; i < 64; i++)
+    for (int i = 0; i < 48; i++)
     {
         result |= (key >> (64 - pc_2[i]) & 1) << 64 - (i + 1);
     }
@@ -105,7 +150,7 @@ u64 expansion(u64 rightSide)
                          24, 25, 26, 27, 28, 29,
                          28, 29, 30, 31, 32, 1};
     u64 result = 0;
-    for (int i = 0; i < 64; i++)
+    for (int i = 0; i < 48; i++)
     {
         result |= (rightSide >> (64 - E_t[i]) & 1) << 64 - (i + 1);
     }
@@ -123,7 +168,7 @@ u64 permutaion(u64 rightSide)
                        19, 13, 30, 6,
                        22, 11, 4, 25};
     u64 result = 0;
-    for (int i = 0; i < 64; i++)
+    for (int i = 0; i < 32; i++)
     {
         result |= (rightSide >> (64 - P[i]) & 1) << 64 - (i + 1);
     }
@@ -167,121 +212,93 @@ u64 sbox(u64 rightSide)
                         {7, 11, 4, 1, 9, 12, 14, 2, 0, 6, 10, 13, 15, 3, 5, 8},
                         {2, 1, 14, 7, 4, 10, 8, 13, 15, 12, 9, 0, 3, 5, 6, 11}}};
     u64 out = 0;
+    rightSide = rightSide>>(64-48);
     for (int i = 0; i < 8; i++)
     {
         u64 idx = (rightSide >> ((7 - i) * 6)) & 0x3f;
         idx = ((idx >> 1) & 15) |
               ((idx & 1) << 4) |
               (idx & 0x20);
-        out = out|(u64(S[i][idx >> 4][idx & 15] )<< ((7 - i) * 4));
+        out = out|(u64(S[i][idx >> 4][idx & 15])<< ((7 - i) * 4));
     }
+    out =out<<32;
     return out;
 }
+
 u64 leftshift(u64 keyhalf, int index)
 {
+    keyhalf = keyhalf>>(64-28);
     int leftShiftTable[16] = {1, 1, 2, 2, 2, 2, 2, 2, 1, 2, 2, 2, 2, 2, 2, 1};
     // store bit        shift left      set rightmost bits      clear leftmost bits
     int stored = keyhalf >> (28 - leftShiftTable[index]);
     keyhalf = (keyhalf << leftShiftTable[index]) | stored;
-    keyhalf = keyhalf & 0xffffff;
-    // keyhalf = (keyhalf << (64 - 28)) >> (64 - 28);
+    keyhalf = keyhalf<<(64-28);
     return keyhalf;
 }
+
+u64 feistelFunction(u64 rightside,u64 key){
+    u64 result = 0;
+    result = expansion(rightside);
+    result = result^ key;
+    result= sbox(result);
+    result = permutaion(result);
+    return result;
+}
+
 u64 singleRound(u64 plaintext, u64 key){
-
-    // intitaal permutation and plain text split
+    // initial permutation and plain text split
     plaintext = intialPermutation(plaintext);
-    u64 leftText = plaintext >> 32;
-    // hex for 32 bits
-    u64 rightText = plaintext & 0xffffffff;
-    // u64 rightText = (plaintext << 32) >> 32;
+    u64 leftText = (plaintext >> 32)<<32;
+    u64 rightText = (plaintext << 32);
     u64 cypherText = 0;
-
     // key permutation and split
     key = permutationChoiceKey1(key);
-    u64 keyLeft = (key >> 28);
-    // hex for 28 bits
-    u64 keyRight = key & 0xffffff;
-    // u64 keyRight = (key << (64 - 28)) >> (64 - 28);
+    u64 keyLeft = (key >>(64-28))<<(64-28);
+    u64 keyRight = (key >> (64 - 56)) << (64 - 28);
+    key = 0;
 
-    for (int i = 0; i < 16; i++)
-    {
-        cypherText = expansion(rightText);
+    for (int i = 0; i < 16; i++){
         keyLeft = leftshift(keyLeft, i);
         keyRight = leftshift(keyRight, i);
-        key = key | (keyLeft << 28);
-        key = key | keyRight;
+        key = key | keyLeft;
+        key = key | (keyRight>>28);
         key = permutationChoiceKey2(key);
-        cypherText = cypherText ^ key;
-        cypherText = sbox(cypherText);
-        cypherText = permutaion(cypherText);
+        cypherText = feistelFunction(rightText,key);
         cypherText = cypherText ^ leftText;
         leftText = rightText;
         rightText = cypherText;
+        key =0;
     }
     cypherText = rightText;
     rightText = leftText;
     leftText = cypherText;
-    
-
     cypherText = 0;
-    cypherText = cypherText | (leftText << 32);
-    cypherText = cypherText | rightText;
+    cypherText = cypherText | (leftText);
+    cypherText = cypherText | (rightText>>32);
     cypherText = inverseIntialPermutation(cypherText);
     return cypherText;
 }
-unsigned long long messgaePlainHelper (int x , unsigned long long d , int i){
 
-    d |= (unsigned long long)(x) << ((7-i) << 3);
-    return d;
-
+void outputBinary(u64 cypher){
+    // shift then output to file instead of cout
+    for(int i=0;i<64;i++){
+        cout<<((cypher >>(63-i))&1);
+    }
 }
-void readMessagePlain (){
-    std::ifstream t("message.txt");
-    std::stringstream buffer;
-    buffer << t.rdbuf();
-    string s = buffer.str();
-    vector <string> abo3li;
-    int counter = 0;
-    string temp = "";
 
-
-    for (auto c : s){
-        temp += c;
-        counter++;
-        if (counter == 8){
-            abo3li.push_back(temp);
-            counter=0;
-            temp="";
+void outputHex(u64 cypher){
+    // shift then output to file instead of cout
+    int value =0;
+    char c;
+    for(int i=0;i<16;i++){
+        value = (cypher>>((15-i)<<2))&0xf;
+        if(value<10){
+            cout<<value;
+        }else{
+            c = char('A'+(value-10));
+            cout<<c;
         }
     }
-
-    int arr[abo3li.size()][8];
-    for (int i = 0 ; i < abo3li.size(); i++){
-        string temporary = abo3li[i];
-        for (int j = 0 ; j <8; j++){
-            arr[i][j] = int(temporary[j]);
-        }
-    }
-
-    unsigned long long converted_array [abo3li.size()];
-    for (int i = 0 ; i < abo3li.size(); i++){
-            unsigned long long value = 0;
-        for (int j = 0 ; j < 8; j++){
-            value = messgaePlainHelper(abo3li[i][j], value, j);
-        }
-        converted_array[i] = value;
-        value = 0;
-    }
-
-    /* for (auto i : arr[0]){
-        cout << i << " ";
-    }
-    cout << endl;
-    cout << converted_array[0]; */
-
-    // all in converted_array
-
 }
 
 int main()
@@ -292,8 +309,19 @@ int main()
     file.open("key.txt");
     file >> s;
     u64 key = readDESInputhex(s);
-
     // Plain Text 
-    // readMessagePlain();
+    readMessagePlain();
+    u64 encrypted [convertedSize]={0}; 
+    long long t1=__rdtsc();
+    cout<<singleRound(converted[0],key);
+    for(int i=0;i<convertedSize;i++){
+        encrypted[i] = singleRound(converted[i],key);
+    //     outputBinary(encrypted[i]);
+    //     outputHex(encrypted[i]);
+    }
+    long long t2=__rdtsc();
+    printf("Cycles: to decrypt the file %lld\n", t2-t1);
+
+
 
 }
