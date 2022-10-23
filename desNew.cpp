@@ -282,11 +282,12 @@ u64 singleRound(u64 plaintext, u64 key){
 void outputPlainText(u64 cypher){
     // shift then output to file instead of cout
     int value =0;
+    ofstream myFile ("output.txt");
     char c;
     for(int i=0;i<8;i++){
         value = (cypher>>((7-i)<<3))&0xff;
             c = char(value);
-            cout<<c;
+            myFile << c;
     }
 }
 
