@@ -66,6 +66,7 @@ void readMessagePlain (){
         converted[i] = value;
         value = 0;
     }
+    file.close();
 }
 
 u64 intialPermutation(u64 plainText)
@@ -301,13 +302,11 @@ int main()
     u64 key = readDESInputhex(s);
     // Plain Text 
     readMessagePlain();
-    ifstream output;
-    // output.open("encrypted.txt","w");
     u64 encrypted [convertedSize]={0}; 
     long long t1=__rdtsc();
     for(int i=0;i<convertedSize;i++){
         encrypted[i] = singleRound(converted[i],key);
-        // outputPlainText(encrypted[i]);
+        outputPlainText(encrypted[i]);
     }
     long long t2=__rdtsc();
     printf("Cycles to decrypt and write the file: %lld\n", t2-t1);
