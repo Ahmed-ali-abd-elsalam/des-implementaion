@@ -279,25 +279,14 @@ u64 singleRound(u64 plaintext, u64 key){
     return cypherText;
 }
 
-void outputBinary(u64 cypher){
-    // shift then output to file instead of cout
-    for(int i=0;i<64;i++){
-        cout<<((cypher >>(63-i))&1);
-    }
-}
-
-void outputHex(u64 cypher){
+void outputPlainText(u64 cypher){
     // shift then output to file instead of cout
     int value =0;
     char c;
-    for(int i=0;i<16;i++){
-        value = (cypher>>((15-i)<<2))&0xf;
-        if(value<10){
-            cout<<value;
-        }else{
-            c = char('A'+(value-10));
+    for(int i=0;i<8;i++){
+        value = (cypher>>((7-i)<<3))&0xff;
+            c = char(value);
             cout<<c;
-        }
     }
 }
 
@@ -308,19 +297,20 @@ int main()
     ifstream file;
     file.open("key.txt");
     file >> s;
+    file.close();
     u64 key = readDESInputhex(s);
     // Plain Text 
     readMessagePlain();
+    ifstream output;
+    // output.open("encrypted.txt","w");
     u64 encrypted [convertedSize]={0}; 
     long long t1=__rdtsc();
-    cout<<singleRound(converted[0],key);
     for(int i=0;i<convertedSize;i++){
         encrypted[i] = singleRound(converted[i],key);
-    //     outputBinary(encrypted[i]);
-    //     outputHex(encrypted[i]);
+        // outputPlainText(encrypted[i]);
     }
     long long t2=__rdtsc();
-    printf("Cycles: to decrypt the file %lld\n", t2-t1);
+    printf("Cycles to decrypt and write the file: %lld\n", t2-t1);
 
 
 
