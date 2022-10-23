@@ -1,74 +1,90 @@
 #include <bits/stdc++.h>
 #ifdef __GNUC__
-# define __rdtsc __builtin_ia32_rdtsc
+#define __rdtsc __builtin_ia32_rdtsc
 #else
-# include<intrin.h>
+#include <intrin.h>
 #endif
 
 using namespace std;
 typedef unsigned long long u64;
 
-u64* converted = new u64 [214748364];
+u64 *converted = new u64[214748364];
 int convertedSize = 0;
+u64 keys[16] = {0};
 
-u64 readDESInputhex(const char *data){
-    u64 value =0;
-    for(int i=0; i<16 ; i++){
+u64 readDESInputhex(const char *data)
+{
+    u64 value = 0;
+    for (int i = 0; i < 16; i++)
+    {
         char c = data[i];
-        if(c>='0' && c<='9'){
-            value |= (u64) (c-'0') << ((15-i)<<2);
+        if (c >= '0' && c <= '9')
+        {
+            value |= (u64)(c - '0') << ((15 - i) << 2);
         }
-        else if(c>='A' && c<='F'){
-            value |= (u64) (c-'A' +10) << ((15-i)<<2);
+        else if (c >= 'A' && c <= 'F')
+        {
+            value |= (u64)(c - 'A' + 10) << ((15 - i) << 2);
         }
-        else if(c>='a' && c<='f'){
-         value |= (u64) (c-'a' +10) << ((15-i)<<2);
+        else if (c >= 'a' && c <= 'f')
+        {
+            value |= (u64)(c - 'a' + 10) << ((15 - i) << 2);
+        }
     }
-}
- return value;
+    return value;
 }
 
-u64 messagePlainHelper (int x , u64 d , int i){
-    d |= (u64)(x) << ((7-i) << 3);
+u64 messagePlainHelper(int x, u64 d, int i)
+{
+    d |= (u64)(x) << ((7 - i) << 3);
     return d;
 }
 
-void readMessagePlain (){
+void readMessagePlain(char mode)
+{
     // array of characters
-    char* array1 = new char [214748364];
-    int array_length = 0;
-    // filling the array
-    char ch;
-    ifstream file;
-    file.open("plain_text.txt" , ios::in);
-    int c = 0;
-    while (!file.eof()){
-        file >> noskipws >> ch;
-        array1[c++] = ch;
-    }
-    array_length = c;
-    int eights =ceil( ((double) (array_length))/8);
-    // 2d array filling  with ascii values of 8 characters for each row
-    int arr [eights][8];
-    int counter = 0;
-    for (int i = 0 ; i < eights ; i++){
-        for (int j = 0 ; j < 8 ; j++){
-            arr[i][j]= int( array1[counter++]);
+        char *array1 = new char[214748364];
+        int array_length = 0;
+        // filling the array
+        char ch;
+        ifstream file;
+        if(mode =='n'){
+            file.open("plain.txt", ios::in);
+        }else{
+            file.open("encrypted.txt", ios::in);
         }
-    }
-    // filling the u64 int array called converted
-    convertedSize = eights;
-    for (int i = 0 ; i < convertedSize; i++){
+        int c = 0;
+        while (!file.eof())
+        {
+            file >> noskipws >> ch;
+            array1[c++] = ch;
+        }
+        array_length = c;
+        int eights = ceil(((double)(array_length)) / 8);
+        // 2d array filling  with ascii values of 8 characters for each row
+        int arr[eights][8];
+        int counter = 0;
+        for (int i = 0; i < eights; i++)
+        {
+            for (int j = 0; j < 8; j++)
+            {
+                arr[i][j] = int(array1[counter++]);
+            }
+        }
+        // filling the u64 int array called converted
+        convertedSize = eights;
+        for (int i = 0; i < convertedSize; i++)
+        {
             u64 value = 0;
-        for (int j = 0 ; j < 8; j++){
-            value = messagePlainHelper(arr[i][j], value, j);
+            for (int j = 0; j < 8; j++)
+            {
+                value = messagePlainHelper(arr[i][j], value, j);
+            }
+            converted[i] = value;
+            value = 0;
         }
-        converted[i] = value;
-        value = 0;
-    }
-    file.close();
+        file.close();
 }
-
 u64 intialPermutation(u64 plainText)
 {
     const int IP_t[64] = {58, 50, 42, 34, 26, 18, 10, 2,
@@ -80,7 +96,8 @@ u64 intialPermutation(u64 plainText)
                           61, 53, 45, 37, 29, 21, 13, 5,
                           63, 55, 47, 39, 31, 23, 15, 7};
     u64 result = 0;
-    for (int i = 0; i < 64; i++){
+    for (int i = 0; i < 64; i++)
+    {
         result |= (plainText >> (64 - IP_t[i]) & 1) << 64 - (i + 1);
     }
     return result;
@@ -117,7 +134,7 @@ u64 permutationChoiceKey1(u64 key)
     u64 result = 0;
     for (int i = 0; i < 56; i++)
     {
-        result |= ((key >> (64 - pc_1[i])) & 1) << 64 - (i+1);
+        result |= ((key >> (64 - pc_1[i])) & 1) << 64 - (i + 1);
     }
     return result;
 }
@@ -213,112 +230,149 @@ u64 sbox(u64 rightSide)
                         {7, 11, 4, 1, 9, 12, 14, 2, 0, 6, 10, 13, 15, 3, 5, 8},
                         {2, 1, 14, 7, 4, 10, 8, 13, 15, 12, 9, 0, 3, 5, 6, 11}}};
     u64 out = 0;
-    rightSide = rightSide>>(64-48);
+    rightSide = rightSide >> (64 - 48);
     for (int i = 0; i < 8; i++)
     {
         u64 idx = (rightSide >> ((7 - i) * 6)) & 0x3f;
         idx = ((idx >> 1) & 15) |
               ((idx & 1) << 4) |
               (idx & 0x20);
-        out = out|(u64(S[i][idx >> 4][idx & 15])<< ((7 - i) * 4));
+        out = out | (u64(S[i][idx >> 4][idx & 15]) << ((7 - i) * 4));
     }
-    out =out<<32;
+    out = out << 32;
     return out;
 }
 
 u64 leftshift(u64 keyhalf, int index)
 {
-    keyhalf = keyhalf>>(64-28);
+    keyhalf = keyhalf >> (64 - 28);
     int leftShiftTable[16] = {1, 1, 2, 2, 2, 2, 2, 2, 1, 2, 2, 2, 2, 2, 2, 1};
     // store bit        shift left      set rightmost bits      clear leftmost bits
     int stored = keyhalf >> (28 - leftShiftTable[index]);
     keyhalf = (keyhalf << leftShiftTable[index]) | stored;
-    keyhalf = keyhalf<<(64-28);
+    keyhalf = keyhalf << (64 - 28);
     return keyhalf;
 }
 
-u64 feistelFunction(u64 rightside,u64 key){
+u64 feistelFunction(u64 rightside, u64 key)
+{
     u64 result = 0;
     result = expansion(rightside);
-    result = result^ key;
-    result= sbox(result);
+    result = result ^ key;
+    result = sbox(result);
     result = permutaion(result);
     return result;
 }
 
-u64 singleRound(u64 plaintext, u64 key){
+u64 singleRound(u64 plaintext, u64 key, char mode)
+{
     // initial permutation and plain text split
-    plaintext = intialPermutation(plaintext);
-    u64 leftText = (plaintext >> 32)<<32;
-    u64 rightText = (plaintext << 32);
-    u64 cypherText = 0;
-    // key permutation and split
-    key = permutationChoiceKey1(key);
-    u64 keyLeft = (key >>(64-28))<<(64-28);
-    u64 keyRight = (key >> (64 - 56)) << (64 - 28);
-    key = 0;
-
-    for (int i = 0; i < 16; i++){
-        keyLeft = leftshift(keyLeft, i);
-        keyRight = leftshift(keyRight, i);
-        key = key | keyLeft;
-        key = key | (keyRight>>28);
-        key = permutationChoiceKey2(key);
-        cypherText = feistelFunction(rightText,key);
-        cypherText = cypherText ^ leftText;
-        leftText = rightText;
-        rightText = cypherText;
-        key =0;
-    }
-    cypherText = rightText;
-    rightText = leftText;
-    leftText = cypherText;
-    cypherText = 0;
-    cypherText = cypherText | (leftText);
-    cypherText = cypherText | (rightText>>32);
-    cypherText = inverseIntialPermutation(cypherText);
-    return cypherText;
+        plaintext = intialPermutation(plaintext);
+        u64 leftText = (plaintext >> 32) << 32;
+        u64 rightText = (plaintext << 32);
+        u64 cypherText = 0;
+        // key permutation and split
+        if(mode == 'n'){
+            key = permutationChoiceKey1(key);
+            u64 keyLeft = (key >> (64 - 28)) << (64 - 28);
+            u64 keyRight = (key >> (64 - 56)) << (64 - 28);
+            key = 0;
+            for (int i = 0; i < 16; i++)
+            {
+                keyLeft = leftshift(keyLeft, i);
+                keyRight = leftshift(keyRight, i);
+                key = key | keyLeft;
+                key = key | (keyRight >> 28);
+                key = permutationChoiceKey2(key);
+                keys[i] = key;
+                cypherText = feistelFunction(rightText, key);
+                cypherText = cypherText ^ leftText;
+                leftText = rightText;
+                rightText = cypherText;
+                key = 0;
+            }
+        }else{
+            for (int i = 0; i < 16; i++) {
+                cypherText = feistelFunction(rightText, keys[15-i]);
+                cypherText = cypherText ^ leftText;
+                leftText = rightText;
+                rightText = cypherText;
+                key = 0;
+            }
+        }
+        cypherText = rightText;
+        rightText = leftText;
+        leftText = cypherText;
+        cypherText = 0;
+        cypherText = cypherText | (leftText);
+        cypherText = cypherText | (rightText >> 32);
+        cypherText = inverseIntialPermutation(cypherText);
+        return cypherText;
 }
 
-char outputPlainText(u64 cypher){
-   // shift then output to file instead of cout
-    int value =0;
-    ofstream myFile ("cypher.txt" , ios_base::app);
-    char c;
-    for(int i=0;i<8;i++){
-        value = (cypher>>((7-i)<<3))&0xff;
+void outputPlainText(u64 cypher, char mode)
+{
+    // shift then output to file instead of cout
+    int value = 0;
+    if (mode == 'n')
+    {
+        ofstream myFile("encrypted.txt", ios_base::app);
+        char c;
+        for (int i = 0; i < 8; i++)
+        {
+            value = (cypher >> ((7 - i) << 3)) & 0xff;
             c = (char)value;
-            //cout << c;
             myFile << c;
-            
-}
+        }
+    }
+    else
+    {
+        ofstream myFile("decrypt.txt", ios_base::app);
+        char c;
+        for (int i = 0; i < 8; i++)
+        {
+            value = (cypher >> ((7 - i) << 3)) & 0xff;
+            c = (char)value;
+            myFile << c;
+        }
+    }
 }
 
 int main()
 {
     ofstream outfile;
-    outfile.open("cypher.txt", ofstream::out | ofstream::trunc);
+    outfile.open("encrypted.txt", ofstream::out | ofstream::trunc);
     outfile.close();
-    //Read key input as 16 hex characters
-    char s[16]; 
+    // Read key input as 16 hex characters
+    char s[16];
     ifstream file;
     file.open("key.txt");
     file >> s;
     file.close();
     u64 key = readDESInputhex(s);
-    // Plain Text 
-    readMessagePlain();
-    ifstream output;
-    // output.open("encrypted.txt","w");
-    u64 encrypted [convertedSize]={0}; 
-    long long t1=__rdtsc();
-    for(int i=0;i<convertedSize;i++){
-        encrypted[i] = singleRound(converted[i],key);
-        outputPlainText(encrypted[i]);
+    // Plain Text
+    char mode = 'n';
+    readMessagePlain(mode);
+    u64 encrypted[convertedSize] = {0};
+    long long t1 = __rdtsc();
+    for (int i = 0; i < convertedSize; i++)
+    {
+        encrypted[i] = singleRound(converted[i], key, mode);
+        outputPlainText(encrypted[i], mode);
     }
-    long long t2=__rdtsc();
-    //printf("Cycles to decrypt and write the file: %lld\n", t2-t1);
-
-
-
+    
+    long long t2 = __rdtsc();
+    printf("Cycles to decrypt and write the file: %lld\n", t2 - t1);
+    cout << "do you want to decrypt ? type y or n ";
+    cin >> mode;
+    if (mode == 'y'){
+        readMessagePlain(mode);
+        for (int i = 0; i < convertedSize; i++)
+        {
+            encrypted[i] = singleRound(converted[i], key, mode);
+            cout<<encrypted[i]<<endl;
+            outputPlainText(encrypted[i], mode);
+        }
+    }
+    // cout<<endl<<keys[15];
 }
