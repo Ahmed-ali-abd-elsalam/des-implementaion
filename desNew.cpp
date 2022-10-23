@@ -280,7 +280,7 @@ u64 singleRound(u64 plaintext, u64 key){
     return cypherText;
 }
 
-char outputPlainText(u64 cypher){
+void outputPlainText(u64 cypher){
    // shift then output to file instead of cout
     int value =0;
     ofstream myFile ("cypher.txt" , ios_base::app);
