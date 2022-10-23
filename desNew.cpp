@@ -280,16 +280,18 @@ u64 singleRound(u64 plaintext, u64 key){
     return cypherText;
 }
 
-void outputPlainText(u64 cypher){
+char outputPlainText(u64 cypher){
     // shift then output to file instead of cout
     int value =0;
-    ofstream myFile ("output.txt");
+    // ofstream myFile ("output.txt");
     char c;
     for(int i=0;i<8;i++){
         value = (cypher>>((7-i)<<3))&0xff;
             c = char(value);
-            myFile << c;
+            // cout<<c;
+            // myFile << c;
     }
+    return c;
 }
 
 int main()
@@ -303,11 +305,12 @@ int main()
     u64 key = readDESInputhex(s);
     // Plain Text 
     readMessagePlain();
+    ofstream myFile ("output.txt");
     u64 encrypted [convertedSize]={0}; 
     long long t1=__rdtsc();
     for(int i=0;i<convertedSize;i++){
         encrypted[i] = singleRound(converted[i],key);
-        outputPlainText(encrypted[i]);
+        myFile<<outputPlainText(encrypted[i]);
     }
     long long t2=__rdtsc();
     printf("Cycles to decrypt and write the file: %lld\n", t2-t1);
