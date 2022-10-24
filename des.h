@@ -6,6 +6,9 @@
 #endif
 using namespace std;
 typedef unsigned long long u64;
+u64 *converted = new u64[214748364];
+int convertedSize = 0;
+u64 keys[16] = {0};
 u64 readDESInputhex(const char *data);
 u64 messagePlainHelper(int x, u64 d, int i);
 void readMessagePlain(char mode);
