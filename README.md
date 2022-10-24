@@ -8,7 +8,7 @@ A fully function implentation of the DES Algorithm in C++ able to
 * Encyrpted output file in __encrypt.txt__
 * Decrypted file in __decrypt.txt__
 
-## Team Memebers
+## Team Members
 | Name                   |ID |
 |-----|--------|
 |Ahmed Ali Abd El salaam| 1807799|
