@@ -9,8 +9,6 @@ A fully function implentation of the DES Algorithm in C++ able to
 * Decrypted file in __decrypt.txt__
 
 ## Team Memebers
-1. Ahmed Ali Abd El salaam 1807799
-1. Abdelrahman Bauomyi Abdelsattar Bauomyi 1809731
-1. Lotfy Mabrouk Aly El-Said 1803659
-1. Mostafa Mohamed Nageb 1809079
-1. Abdelrahman Osama Ahmed Mohamed 1808518 
+| Name | Email |
+|-----|--------|
+
