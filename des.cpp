@@ -1,4 +1,14 @@
-#include "des.h"
+#include <bits/stdc++.h>
+#ifdef __GNUC__
+#define __rdtsc __builtin_ia32_rdtsc
+#else
+#include <intrin.h>
+#endif
+using namespace std;
+typedef unsigned long long u64;
+u64 *converted = new u64[214748364];
+int convertedSize = 0;
+u64 keys[16] = {0};
 u64 readDESInputhex(const char *data)
 {
     u64 value = 0;
