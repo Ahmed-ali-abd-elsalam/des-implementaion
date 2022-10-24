@@ -1,5 +1,10 @@
-binary.txt
-cypher.txt
-key.txt
-trial.txt
 des.exe
+tempCodeRunnerFile.cpp
+.vscode/settings.json
+DES Sample.rar
+.gitignore
+DES Sample/cipher_text.dat
+DES Sample/key.txt
+DES Sample/plain_text.txt
+desNew.exe
+network.cpp
