@@ -40,7 +40,7 @@ u64 messagePlainHelper(int x, u64 d, int i)
     return d;
 }
 
-void readMessagePlain(char mode)
+void readMessagePlain()
 {
     // array of characters
         char *array1 = new char[214748364];
@@ -48,11 +48,7 @@ void readMessagePlain(char mode)
         // filling the array
         char ch;
         ifstream file;
-        if(mode =='n'){
-            file.open("plain.txt", ios::in);
-        }else{
-            file.open("encrypted.txt", ios::in);
-        }
+        file.open("plain.txt", ios::in);
         int c = 0;
         while (!file.eof())
         {
@@ -266,12 +262,10 @@ u64 feistelFunction(u64 rightside, u64 key)
 
 u64 singleRound(u64 plaintext, u64 key, char mode)
 {
-    // initial permutation and plain text split
         plaintext = intialPermutation(plaintext);
         u64 leftText = (plaintext >> 32) << 32;
         u64 rightText = (plaintext << 32);
         u64 cypherText = 0;
-        // key permutation and split
         if(mode == 'n'){
             key = permutationChoiceKey1(key);
             u64 keyLeft = (key >> (64 - 28)) << (64 - 28);
@@ -312,7 +306,6 @@ u64 singleRound(u64 plaintext, u64 key, char mode)
 
 void outputPlainText(u64 cypher, char mode)
 {
-    // shift then output to file instead of cout
     int value = 0;
     if (mode == 'n')
     {
@@ -337,13 +330,13 @@ void outputPlainText(u64 cypher, char mode)
         }
     }
 }
-
 int main()
 {
     ofstream outfile;
     outfile.open("encrypted.txt", ofstream::out | ofstream::trunc);
     outfile.close();
-    // Read key input as 16 hex characters
+    outfile.open("decrypt.txt", ofstream::out | ofstream::trunc);
+    outfile.close();
     char s[16];
     ifstream file;
     file.open("key.txt");
@@ -352,7 +345,7 @@ int main()
     u64 key = readDESInputhex(s);
     // Plain Text
     char mode = 'n';
-    readMessagePlain(mode);
+    readMessagePlain();
     u64 encrypted[convertedSize] = {0};
     long long t1 = __rdtsc();
     for (int i = 0; i < convertedSize; i++)
@@ -366,13 +359,10 @@ int main()
     cout << "do you want to decrypt ? type y or n ";
     cin >> mode;
     if (mode == 'y'){
-        readMessagePlain(mode);
         for (int i = 0; i < convertedSize; i++)
         {
-            encrypted[i] = singleRound(converted[i], key, mode);
-            cout<<encrypted[i]<<endl;
+            encrypted[i] = singleRound(encrypted[i], key, mode);
             outputPlainText(encrypted[i], mode);
         }
     }
-    // cout<<endl<<keys[15];
 }
