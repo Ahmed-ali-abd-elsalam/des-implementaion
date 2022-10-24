@@ -320,7 +320,7 @@ void outputPlainText(u64 cypher, char mode)
 int main()
 {
     ofstream outfile;
-    outfile.open("encrypted.txt", ofstream::out | ofstream::trunc);
+    outfile.open("encrypt.txt", ofstream::out | ofstream::trunc);
     outfile.close();
     outfile.open("decrypt.txt", ofstream::out | ofstream::trunc);
     outfile.close();
@@ -343,7 +343,7 @@ int main()
     
     long long t2 = __rdtsc();
     printf("Cycles to decrypt and write the file: %lld\n", t2 - t1);
-    cout << "do you want to decrypt ? type y or n ";
+    cout << "Do you want to decrypt ? type y or n ";
     cin >> mode;
     if (mode == 'y'){
         for (int i = 0; i < convertedSize; i++)
