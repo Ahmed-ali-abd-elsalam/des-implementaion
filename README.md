@@ -2,6 +2,7 @@
 A fully function implentation of the DES Algorithm in C++ able to
 * Encrypt a sample plain text file given a key in hexadecimal where the plain text is written in plain.txt and the key is in key.txt , the resulting encrypted file can be found in ecrypted.txt
 * Decrypt to plaintext given a key in hexadecimal where the decrypted file can be found in decrypt.txt
+## The program encrypts by default and the decryption is given as an option
 
 ## Team Memebers
 1. Ahmed Ali Abd El salaam 1807799
