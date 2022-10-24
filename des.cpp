@@ -1,8 +1,4 @@
 #include "des.h"
-u64 *converted = new u64[214748364];
-int convertedSize = 0;
-u64 keys[16] = {0};
-
 u64 readDESInputhex(const char *data)
 {
     u64 value = 0;
