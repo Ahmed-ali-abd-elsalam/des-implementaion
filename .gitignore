@@ -8,3 +8,7 @@ DES Sample/key.txt
 DES Sample/plain_text.txt
 desNew.exe
 network.cpp
+des_g2.cpp
+des_g2.exe
+desNew.cpp
+encrypted.txt

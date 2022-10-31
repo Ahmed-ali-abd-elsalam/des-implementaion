@@ -9,75 +9,7 @@ typedef unsigned long long u64;
 u64 *converted = new u64[214748364];
 int convertedSize = 0;
 u64 keys[16] = {0};
-u64 readDESInputhex(const char *data)
-{
-    u64 value = 0;
-    for (int i = 0; i < 16; i++)
-    {
-        char c = data[i];
-        if (c >= '0' && c <= '9')
-        {
-            value |= (u64)(c - '0') << ((15 - i) << 2);
-        }
-        else if (c >= 'A' && c <= 'F')
-        {
-            value |= (u64)(c - 'A' + 10) << ((15 - i) << 2);
-        }
-        else if (c >= 'a' && c <= 'f')
-        {
-            value |= (u64)(c - 'a' + 10) << ((15 - i) << 2);
-        }
-    }
-    return value;
-}
 
-u64 messagePlainHelper(int x, u64 d, int i)
-{
-    d |= (u64)(x) << ((7 - i) << 3);
-    return d;
-}
-
-void readMessagePlain()
-{
-    // array of characters
-        char *array1 = new char[214748364];
-        int array_length = 0;
-        // filling the array
-        char ch;
-        ifstream file;
-        file.open("plainSample.txt", ios::in);
-        int c = 0;
-        while (!file.eof())
-        {
-            file >> noskipws >> ch;
-            array1[c++] = ch;
-        }
-        array_length = c;
-        int eights = ceil(((double)(array_length)) / 8);
-        // 2d array filling  with ascii values of 8 characters for each row
-        int arr[eights][8];
-        int counter = 0;
-        for (int i = 0; i < eights; i++)
-        {
-            for (int j = 0; j < 8; j++)
-            {
-                arr[i][j] = int(array1[counter++]);
-            }
-        }
-        // filling the u64 int array called converted
-        convertedSize = eights;
-        for (int i = 0; i < convertedSize; i++)
-        {
-            u64 value = 0;
-            for (int j = 0; j < 8; j++)
-            {
-                value = messagePlainHelper(arr[i][j], value, j);
-            }
-            converted[i] = value;
-            value = 0;
-        }
-        file.close();
-}
 u64 intialPermutation(u64 plainText)
 {
     const int IP_t[64] = {58, 50, 42, 34, 26, 18, 10, 2,
@@ -271,14 +203,13 @@ void keyperm(u64 key){
                 key = 0;
             }
 }
-
-u64 singleRound(u64 plaintext, u64 key, char mode){
+u64 DESAlgo(u64 plaintext, u64 key, string mode){
         plaintext = intialPermutation(plaintext);
         u64 leftText = (plaintext >> 32) << 32;
         u64 rightText = (plaintext << 32);
         u64 cypherText = 0;
         keyperm(key);
-        if(mode == 'n'){
+        if(mode == "encrypt"){
             for (int i = 0; i < 16; i++)
             {
                 cypherText = feistelFunction(rightText, keys[i]);
@@ -306,12 +237,80 @@ u64 singleRound(u64 plaintext, u64 key, char mode){
         return cypherText;
 }
 
-void outputPlainText(u64 cypher, char mode)
+u64 readDESInputhex(const char *data)
+{
+    u64 value = 0;
+    for (int i = 0; i < 16; i++)
+    {
+        char c = data[i];
+        if (c >= '0' && c <= '9')
+        {
+            value |= (u64)(c - '0') << ((15 - i) << 2);
+        }
+        else if (c >= 'A' && c <= 'F')
+        {
+            value |= (u64)(c - 'A' + 10) << ((15 - i) << 2);
+        }
+        else if (c >= 'a' && c <= 'f')
+        {
+            value |= (u64)(c - 'a' + 10) << ((15 - i) << 2);
+        }
+    }
+    return value;
+}
+
+u64 messagePlainHelper(int x, u64 d, int i)
+{
+    d |= (u64)(x) << ((7 - i) << 3);
+    return d;
+}
+
+void readMessagePlain(string inputFile)
+{
+    // array of characters
+        char *array1 = new char[214748364];
+        int array_length = 0;
+        // filling the array
+        char ch;
+        ifstream file;
+        file.open(inputFile, ios::in);
+        int c = 0;
+        while (!file.eof())
+        {
+            file >> noskipws >> ch;
+            array1[c++] = ch;
+        }
+        array_length = c;
+        int eights = ceil(((double)(array_length)) / 8);
+        // 2d array filling  with ascii values of 8 characters for each row
+        int arr[eights][8];
+        int counter = 0;
+        for (int i = 0; i < eights; i++)
+        {
+            for (int j = 0; j < 8; j++)
+            {
+                arr[i][j] = int(array1[counter++]);
+            }
+        }
+        // filling the u64 int array called converted
+        convertedSize = eights;
+        for (int i = 0; i < convertedSize; i++)
+        {
+            u64 value = 0;
+            for (int j = 0; j < 8; j++)
+            {
+                value = messagePlainHelper(arr[i][j], value, j);
+            }
+            converted[i] = value;
+            value = 0;
+        }
+        file.close();
+}
+void outputPlainText(u64 cypher, string outputFile)
 {
     int value = 0;
-    if (mode == 'n')
-    {
-        ofstream myFile("encrypted.txt", ios_base::app);
+
+        ofstream myFile(outputFile, ios_base::app);
         char c;
         for (int i = 0; i < 8; i++)
         {
@@ -319,53 +318,38 @@ void outputPlainText(u64 cypher, char mode)
             c = (char)value;
             myFile << c;
         }
-    }
-    else
-    {
-        ofstream myFile("decrypt.txt", ios_base::app);
-        char c;
-        for (int i = 0; i < 8; i++)
-        {
-            value = (cypher >> ((7 - i) << 3)) & 0xff;
-            c = (char)value;
-            myFile << c;
-        }
-    }
 }
-int main()
-{
+
+
+int main(int argc,char**argv){
+
+    string mode = argv[1];
+    string inputFile = argv[2];
+    string keyFile = argv[3];
+    string outputFile = argv[4];
+
     ofstream outfile;
-    outfile.open("encrypted.txt", ofstream::out | ofstream::trunc);
+    outfile.open(outputFile, ofstream::out | ofstream::trunc);
     outfile.close();
-    outfile.open("decrypt.txt", ofstream::out | ofstream::trunc);
-    outfile.close();
+
     char s[16];
     ifstream file;
-    file.open("keySample.txt");
+    file.open(keyFile);
     file >> s;
     file.close();
     u64 key = readDESInputhex(s);
-    cout<<key<<endl;
-    // Plain Text
-    char mode = 'n';
-    readMessagePlain();
+
+    readMessagePlain(inputFile);
+
     u64 encrypted[convertedSize] = {0};
     long long t1 = __rdtsc();
+    cout<<converted[0]<<endl;
     for (int i = 0; i < convertedSize; i++)
     {
-        encrypted[i] = singleRound(converted[i], key, mode);
-        outputPlainText(encrypted[i], mode);
+        encrypted[i] = DESAlgo(converted[i], key, mode);
+        outputPlainText(encrypted[i], outputFile);
     }
-    
     long long t2 = __rdtsc();
     printf("Cycles to decrypt and write the file: %lld\n", t2 - t1);
-    cout << "Do you want to decrypt ? type y or n ";
-    cin >> mode;
-    if (mode == 'y'){
-        for (int i = 0; i < convertedSize; i++)
-        {
-            encrypted[i] = singleRound(encrypted[i], key, mode);
-            outputPlainText(encrypted[i], mode);
-        }
-    }
+    return 0;
 }
